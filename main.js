@@ -79,7 +79,6 @@ const updateAnArticleById = (req, res, next) => {
     req.body.hasOwnProperty("author")
   ) {
     let id = JSON.parse(req.params.id);
-    console.log(id);
     let index;
     let found = articles.find((ele, i) => {
       index = i;
@@ -98,13 +97,40 @@ const updateAnArticleById = (req, res, next) => {
     } else {
       res.status(404);
       res.json("Wrong ID");
+      next();
     }
   } else {
     res.status(404);
     res.json("Wrong entry");
+    next();
   }
 };
+
 app.put("/articles/:id", updateAnArticleById);
+
+const deleteArticleById = (req, res, next) => {
+  let id = JSON.parse(req.params.id);
+  let index;
+  let found = articles.find((ele, i) => {
+    index = i;
+    return id === ele.id;
+  });
+  if (found) {
+    articles.splice(index, 1);
+    res.status(410);
+    res.json({
+      success: true,
+      message: `Success Delete article with id => ${id}`,
+    });
+    next();
+  } else {
+    res.status(404);
+    res.json("Wrong ID");
+    next();
+  }
+};
+
+app.delete("/articles/:id", deleteArticleById);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
