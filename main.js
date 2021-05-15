@@ -27,7 +27,20 @@ const getAllArticles = (req, res, next) => {
   res.json(articles);
   next();
 };
+
 app.get("/articles", getAllArticles);
+
+const getArticlesByAuthor = (req, res, next) => {
+  let author = req.query.author;
+  const authorArray = articles.filter((ele) => {
+    return ele.author === author;
+  });
+  res.status(200);
+  res.json(authorArray);
+  next();
+};
+
+app.get("/articles/search_1", getArticlesByAuthor);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
