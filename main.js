@@ -1,5 +1,7 @@
 const { json } = require("express");
 const express = require("express");
+const { uuid } = require("uuidv4");
+
 const app = express();
 const PORT = 5000;
 
@@ -56,6 +58,16 @@ const getAnArticleById = (req, res, next) => {
 };
 
 app.get("/articles/search_2", getAnArticleById);
+
+const createNewArticle = (req, res, next) => {
+  let newArticle = req.body;
+  newArticle.id = uuid();
+  articles.push(newArticle);
+  res.status(201);
+  res.json(newArticle);
+};
+
+app.post("/articles", createNewArticle);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
