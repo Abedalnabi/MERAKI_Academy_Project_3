@@ -134,21 +134,26 @@ app.delete("/articles/:id", deleteArticleById);
 
 const deleteArticlesByAuthor = (req, res, next) => {
   let deleteAuthor = req.body.author;
-  articles.forEach((ele, i) => {
-    if (ele.author === deleteAuthor) {
-      articles.splice(i, 1);
-      res.status(410);
-      res.json({
-        success: true,
-        message: ` Success delete all the articles for the author => ${deleteAuthor}`,
-      });
-      next();
-    } else {
-      res.status(404);
-      res.json("No author have this name");
-      next();
-    }
+  const found = articles.find((ele, i) => {
+    return deleteAuthor === ele.author;
   });
+  if (found) {
+    let obj = {};
+    for (let i = 0; i < articles.length; i++) {
+      if (deleteAuthor === articles[i].author) {
+        articles.splice(i, 1);
+        i--;
+        obj.success = true;
+        obj.message = ` Success delete all the articles for the author => ${deleteAuthor}`;
+      }
+    }
+    res.status(410);
+    res.json(obj);
+    next();
+  } else {
+    res.status(404);
+    res.json("No author have this name");
+  }
 };
 
 app.delete("/articles", deleteArticlesByAuthor);
