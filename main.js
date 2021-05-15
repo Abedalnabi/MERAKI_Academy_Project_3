@@ -1,6 +1,9 @@
+const { json } = require("express");
 const express = require("express");
 const app = express();
 const PORT = 5000;
+
+app.use(express.json());
 
 const articles = [
   {
@@ -41,6 +44,18 @@ const getArticlesByAuthor = (req, res, next) => {
 };
 
 app.get("/articles/search_1", getArticlesByAuthor);
+
+const getAnArticleById = (req, res, next) => {
+  let id = JSON.parse(req.query.id);
+  const idArray = articles.filter((ele) => {
+    return ele.id === id;
+  });
+  res.status(200);
+  res.json(idArray);
+  next();
+};
+
+app.get("/articles/search_2", getAnArticleById);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
