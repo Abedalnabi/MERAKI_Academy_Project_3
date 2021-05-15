@@ -73,23 +73,39 @@ const createNewArticle = (req, res, next) => {
 app.post("/articles", createNewArticle);
 
 const updateAnArticleById = (req, res, next) => {
-  let id = JSON.parse(req.parse.id);
-  let index;
-  let found = articles.find((ele, i) => {
-    index = i;
-    return id === ele.id;
-  });
-  if (found) {
-    articles[index] = {
-      id: id,
-      title: req.body.title,
-      description: req.body.description,
-      author: req.body.author,
-    };
+  if (
+    req.body.hasOwnProperty("title") &&
+    req.body.hasOwnProperty("description") &&
+    req.body.hasOwnProperty("author")
+  ) {
+    let id = JSON.parse(req.params.id);
+    console.log(id);
+    let index;
+    let found = articles.find((ele, i) => {
+      index = i;
+      return id === ele.id;
+    });
+    if (found) {
+      articles[index] = {
+        id: id,
+        title: req.body.title,
+        description: req.body.description,
+        author: req.body.author,
+      };
+      res.status(201);
+      res.json(articles[index]);
+      next();
+    } else {
+      res.status(404);
+      res.json("Wrong ID");
+    }
+  } else {
+    res.status(404);
+    res.json("Wrong entry");
   }
 };
-
 app.put("/articles/:id", updateAnArticleById);
+
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
 });
