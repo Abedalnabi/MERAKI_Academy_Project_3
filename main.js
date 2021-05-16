@@ -78,15 +78,15 @@ const updateAnArticleById = (req, res, next) => {
     req.body.hasOwnProperty("description") &&
     req.body.hasOwnProperty("author")
   ) {
-    let id = JSON.parse(req.params.id);
+    let id = req.params.id; //Number(id) or JSON.Parse(id)
     let index;
     let found = articles.find((ele, i) => {
       index = i;
-      return id === ele.id;
+      return Number(id) === ele.id;
     });
     if (found) {
       articles[index] = {
-        id: id,
+        id: id, //Or uuid()
         title: req.body.title,
         description: req.body.description,
         author: req.body.author,
@@ -109,11 +109,11 @@ const updateAnArticleById = (req, res, next) => {
 app.put("/articles/:id", updateAnArticleById);
 
 const deleteArticleById = (req, res, next) => {
-  let id = JSON.parse(req.params.id);
+  let id = req.params.id; // Number or Jason.parse
   let index;
   let found = articles.find((ele, i) => {
     index = i;
-    return id === ele.id;
+    return Number(id) === ele.id;
   });
   if (found) {
     articles.splice(index, 1);
@@ -134,10 +134,12 @@ app.delete("/articles/:id", deleteArticleById);
 
 const deleteArticlesByAuthor = (req, res, next) => {
   let deleteAuthor = req.body.author;
+  ///OR USE : filter that include the array and return ele.author != deleteAuthor;
   const found = articles.find((ele, i) => {
     return deleteAuthor === ele.author;
   });
   if (found) {
+    // USE filter : articles = found
     let obj = {};
     for (let i = 0; i < articles.length; i++) {
       if (deleteAuthor === articles[i].author) {
