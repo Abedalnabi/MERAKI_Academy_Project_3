@@ -80,6 +80,8 @@ const getArticlesByAuthor = async (req, res, next) => {
 
 app.get("/articles/search_1", getArticlesByAuthor);
 
+// getAnArticleById
+
 const getAnArticleById = async (req, res) => {
   const id = req.body.id;
   await articles
@@ -95,7 +97,10 @@ const getAnArticleById = async (req, res) => {
       res.json(err);
     });
 };
+
 app.get("/articles/search_2", getAnArticleById);
+
+// updateAnArticleById
 
 const updateAnArticleById = async (req, res) => {
   if (
@@ -103,13 +108,8 @@ const updateAnArticleById = async (req, res) => {
     req.body.hasOwnProperty("description")
   ) {
     const id = req.params.id;
-    await articles.findOneAndUpdate(
-      { _id: id },
-      {
-        title: req.body.title,
-        description: req.body.description,
-      }
-    );
+    updated = req.body;
+    await articles.findOneAndUpdate({ _id: id }, { updated });
     res.status(200);
     res.json("done Updated");
   } else {
@@ -120,14 +120,35 @@ const updateAnArticleById = async (req, res) => {
 
 app.put("/articles/:id", updateAnArticleById);
 
+// deleteArticleById
+
 const deleteArticleById = async (req, res) => {
   const id = req.params.id;
   await articles.findOneAndDelete({ _id: id });
   res.status(200);
   res.json("Done Delete");
 };
-
 app.delete("/articles/:id", deleteArticleById);
+
+// deleteArticlesByAuthor
+
+const deleteArticlesByAuthor = async (req, res, next) => {
+  const author = req.body.author;
+  let ID;
+  await Users.find({ firstName: author })
+    .then((rel) => {
+      ID = rel[0]._id;
+    })
+    .catch((err) => {
+      res.status(404);
+      res.send(err);
+    });
+  await articles.findOneAndDelete({ author: ID });
+  res.status(200);
+  res.json("Done Delete");
+};
+
+app.delete("/articles", deleteArticlesByAuthor);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
