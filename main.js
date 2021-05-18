@@ -43,6 +43,7 @@ const createNewArticle = async (req, res) => {
   const newArticle = ({ title, description, author } = req.body);
   newArticle
     .save()
+    .populate("comments", "comment commenter")
     .then((rsl) => {
       res.status(201);
       res.json(rsl);
@@ -155,10 +156,11 @@ const deleteArticlesByAuthor = async (req, res, next) => {
 
 app.delete("/articles", deleteArticlesByAuthor);
 
+// login
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   await Users.findOne({ email: email, password: password }).then((rsl) => {
-    console.log(rsl);
     if (rsl) {
       res.status(200);
       res.json("Valid login credentials");
@@ -170,6 +172,26 @@ const login = async (req, res) => {
 };
 
 app.post("/login", login);
+
+// createNewComment
+
+const createNewComment = (req, res) => {
+  const idFoArticle = req.params;
+  const { comment, commenter } = req.body;
+  let ID;
+
+  const newComments = new Comments({
+    comment,
+    commenter,
+  });
+  newComments.save().then((rsl) => {
+    res.status(201);
+    res.json(rsl);
+    ID = rsl._id;
+  });
+  articles.findOneAndUpdate({ _id: idFoArticle }, { $push: { comments: ID } });
+};
+app.post("/articles/:id/comments", createNewComment);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
