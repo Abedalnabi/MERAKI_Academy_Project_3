@@ -34,7 +34,6 @@ app.post("/users", (req, res) => {
       res.send(err);
     });
 });
-
 const createNewArticle = async (req, res, next) => {
   const newArticle = ({ title, description, author } = req.body);
 
@@ -52,6 +51,22 @@ const createNewArticle = async (req, res, next) => {
 };
 
 app.post("/articles", createNewArticle);
+
+const getAllArticles = async (req, res, next) => {
+  articles;
+  let a = await articles
+    .find()
+    .then((rsl) => {
+      res.json(rsl);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+  //OR async await
+  //     let a = await articles.find();
+  //     res.json(a);
+};
+app.get("/articles", getAllArticles);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
