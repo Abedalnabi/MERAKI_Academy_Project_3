@@ -14,7 +14,9 @@ const app = express();
 const PORT = 5000;
 app.use(express.json());
 
-app.post("/users", (req, res) => {
+//createNewAuthor
+
+const createNewAuthor = (req, res) => {
   const { firstName, lastName, age, country, email, password } = req.body;
   const newUser = new Users({
     firstName,
@@ -33,7 +35,10 @@ app.post("/users", (req, res) => {
     .catch((err) => {
       res.send(err);
     });
-});
+};
+
+app.post("/users", createNewAuthor);
+
 const createNewArticle = async (req, res) => {
   const newArticle = ({ title, description, author } = req.body);
   newArticle
@@ -149,6 +154,22 @@ const deleteArticlesByAuthor = async (req, res, next) => {
 };
 
 app.delete("/articles", deleteArticlesByAuthor);
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  await Users.findOne({ email: email, password: password }).then((rsl) => {
+    console.log(rsl);
+    if (rsl) {
+      res.status(200);
+      res.json("Valid login credentials");
+    } else {
+      res.status(401);
+      res.json("Invalid login credentials");
+    }
+  });
+};
+
+app.post("/login", login);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
