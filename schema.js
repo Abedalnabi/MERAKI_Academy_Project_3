@@ -12,11 +12,16 @@ const usersSchema = new mongoose.Schema({
 const articlesSchema = new mongoose.Schema({
   title: { type: String, required: true, unique: true },
   description: { type: String, required: true },
-  author: { type: mongoose.Schema.ObjectId, ref: "User" },
+  author: { type: mongoose.Schema.ObjectId, ref: "Users" },
 });
 
-const users1 = mongoose.model("User", usersSchema);
-const articles1 = mongoose.model("Article", articlesSchema);
+const Users = mongoose.model("Users", usersSchema);
+const articles = mongoose.model("articles", articlesSchema);
 
-module.exports.User = users1;
-module.exports.Article = articles1;
+module.exports.Users = Users;
+module.exports.articles = articles;
+
+// module.exports.User2 = mongoose.model("User", usersSchema);
+// module.exports.Article2 = mongoose.model("Article", articlesSchema);
+
+//User2:mongoose.model("User", usersSchema);
