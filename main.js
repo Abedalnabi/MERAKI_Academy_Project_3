@@ -80,6 +80,23 @@ const getArticlesByAuthor = async (req, res, next) => {
 };
 app.get("/articles/search_1", getArticlesByAuthor);
 
+const getAnArticleById = async (req, res, next) => {
+  const id = req.body.id;
+  await articles
+    .find({ author: id })
+    .populate("author", "firstName lastName age country")
+    .exec()
+    .then((rsl) => {
+      res.status(200);
+      res.json(rsl);
+    })
+    .catch((err) => {
+      es.status(404);
+      res.json(err);
+    });
+};
+app.get("/articles/search_2", getAnArticleById);
+
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
 });
