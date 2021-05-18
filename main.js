@@ -68,6 +68,18 @@ const getAllArticles = async (req, res, next) => {
 };
 app.get("/articles", getAllArticles);
 
+const getArticlesByAuthor = async (req, res, next) => {
+  const author = req.query.author;
+  const articlesByAuthor = await articles.findOne({ author: author });
+  res.status(200);
+  res.json(articlesByAuthor).catch((err) => {
+    res.status(404);
+    res.send(err);
+    console.log("DDq");
+  });
+};
+app.get("/articles/search_1", getArticlesByAuthor);
+
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
 });
