@@ -97,6 +97,29 @@ const getAnArticleById = async (req, res) => {
 };
 app.get("/articles/search_2", getAnArticleById);
 
+const updateAnArticleById = async (req, res) => {
+  if (
+    req.body.hasOwnProperty("title") &&
+    req.body.hasOwnProperty("description")
+  ) {
+    let id = req.params.id;
+    const updated = await articles.findOneAndUpdate(
+      { _id: id },
+      {
+        title: req.body.title,
+        description: req.body.description,
+      }
+    );
+    res.status(200);
+    res.json("done Updated");
+  } else {
+    res.status(404);
+    res.json("Wrong entry");
+  }
+};
+
+app.put("/articles/:id", updateAnArticleById);
+
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
 });
