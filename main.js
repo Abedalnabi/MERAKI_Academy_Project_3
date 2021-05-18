@@ -34,53 +34,53 @@ app.post("/users", (req, res) => {
       res.send(err);
     });
 });
-const createNewArticle = async (req, res, next) => {
+const createNewArticle = async (req, res) => {
   const newArticle = ({ title, description, author } = req.body);
-
-  newArtical1
+  newArticle
     .save()
     .then((rsl) => {
       res.status(201);
       res.json(rsl);
-      next();
     })
     .catch((err) => {
+      res.status(404);
       res.send(err);
-      next();
     });
 };
 
 app.post("/articles", createNewArticle);
 
+////getAllArticles
+
 const getAllArticles = async (req, res, next) => {
-  articles;
-  let a = await articles
-    .find()
-    .then((rsl) => {
-      res.json(rsl);
-    })
-    .catch((err) => {
-      res.send(err);
-    });
-  //OR async await
-  //     let a = await articles.find();
-  //     res.json(a);
+  res.status(200);
+  res.json(await articles.find());
 };
 app.get("/articles", getAllArticles);
 
+//getArticlesByAuthor
+
 const getArticlesByAuthor = async (req, res, next) => {
   const author = req.query.author;
-  const articlesByAuthor = await articles.findOne({ author: author });
+  let ID;
+  await Users.find({ firstName: author })
+    .then((rel) => {
+      ID = rel[0]._id;
+    })
+    .catch((err) => {
+      res.status(404);
+      res.send(err);
+    });
   res.status(200);
-  res.json(articlesByAuthor).catch((err) => {
+  res.json(await articles.find({ author: ID })).catch((err) => {
     res.status(404);
     res.send(err);
-    console.log("DDq");
   });
 };
+
 app.get("/articles/search_1", getArticlesByAuthor);
 
-const getAnArticleById = async (req, res, next) => {
+const getAnArticleById = async (req, res) => {
   const id = req.body.id;
   await articles
     .find({ author: id })
