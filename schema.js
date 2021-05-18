@@ -23,7 +23,7 @@ const commentsSchema = new mongoose.Schema({
 
 const Users = mongoose.model("Users", usersSchema);
 const articles = mongoose.model("articles", articlesSchema);
-const Comments = mongoose.model("Comments", articlesSchema);
+const Comments = mongoose.model("Comments", commentsSchema);
 
 module.exports.Users = Users;
 module.exports.articles = articles;
