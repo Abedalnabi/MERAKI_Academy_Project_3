@@ -102,8 +102,8 @@ const updateAnArticleById = async (req, res) => {
     req.body.hasOwnProperty("title") &&
     req.body.hasOwnProperty("description")
   ) {
-    let id = req.params.id;
-    const updated = await articles.findOneAndUpdate(
+    const id = req.params.id;
+    await articles.findOneAndUpdate(
       { _id: id },
       {
         title: req.body.title,
@@ -119,6 +119,15 @@ const updateAnArticleById = async (req, res) => {
 };
 
 app.put("/articles/:id", updateAnArticleById);
+
+const deleteArticleById = async (req, res) => {
+  const id = req.params.id;
+  await articles.findOneAndDelete({ _id: id });
+  res.status(200);
+  res.json("Done Delete");
+};
+
+app.delete("/articles/:id", deleteArticleById);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
