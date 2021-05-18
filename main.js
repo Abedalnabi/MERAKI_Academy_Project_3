@@ -1,7 +1,7 @@
 const { json } = require("express");
 const express = require("express");
 const { uuid } = require("uuidv4");
-const { Users, articles } = require("./schema");
+const { Users, articles, Comments } = require("./schema");
 // const a = require("./schema");
 // const b = require("./schema");
 //this is same above User2 a.User2
