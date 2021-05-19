@@ -1,3 +1,5 @@
+console.log("*-----------Project 3 *-----------");
+
 const { json } = require("express");
 const express = require("express");
 const { uuid } = require("uuidv4");
@@ -114,7 +116,7 @@ const updateAnArticleById = async (req, res) => {
     req.body.hasOwnProperty("description")
   ) {
     const id = req.params.id;
-    updated = req.body;
+    update = req.body;
     await articles.findOneAndUpdate({ _id: id }, { updated });
     res.status(200);
     res.json("done Updated");
@@ -138,7 +140,7 @@ app.delete("/articles/:id", deleteArticleById);
 
 // deleteArticlesByAuthor
 
-const deleteArticlesByAuthor = async (req, res, next) => {
+const deleteArticlesByAuthor = async (req, res) => {
   const author = req.body.author;
   let ID;
   await Users.find({ firstName: author })
@@ -179,19 +181,24 @@ const createNewComment = (req, res) => {
   const idFoArticle = req.params;
   const { comment, commenter } = req.body;
   let ID;
-
   const newComments = new Comments({
     comment,
     commenter,
   });
-  newComments.save().then((rsl) => {
-    res.status(201);
-    res.json(rsl);
-    ID = rsl._id;
-  });
-  articles
-    .findOneAndUpdate({ _id: idFoArticle }, { $push: { comments: ID } })
-    .exec();
+  newComments
+    .save()
+    .then((rsl) => {
+      res.status(201);
+      res.json(rsl);
+      ID = rsl._id;
+      articles
+        .findOneAndUpdate({ _id: idFoArticle }, { $push: { comments: ID } })
+        .exec();
+    })
+    .catch((err) => {
+      res.status(404);
+      res.send(err);
+    });
 };
 
 app.post("/articles/:id/comments", createNewComment);
