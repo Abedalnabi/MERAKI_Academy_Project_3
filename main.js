@@ -39,11 +39,11 @@ const createNewAuthor = (req, res) => {
 
 app.post("/users", createNewAuthor);
 
-const createNewArticle = async (req, res) => {
-  const newArticle = ({ title, description, author } = req.body);
+const createNewArticle = (req, res) => {
+  const { title, description, author } = req.body;
+  const newArticle = new articles({ title, description, author });
   newArticle
     .save()
-    .populate("comments", "comment commenter")
     .then((rsl) => {
       res.status(201);
       res.json(rsl);
@@ -58,15 +58,15 @@ app.post("/articles", createNewArticle);
 
 ////getAllArticles
 
-const getAllArticles = async (req, res, next) => {
+const getAllArticles = async (req, res) => {
   res.status(200);
-  res.json(await articles.find());
+  res.json(await articles.find()).exec();
 };
 app.get("/articles", getAllArticles);
 
 //getArticlesByAuthor
 
-const getArticlesByAuthor = async (req, res, next) => {
+const getArticlesByAuthor = async (req, res) => {
   const author = req.query.author;
   let ID;
   await Users.find({ firstName: author })
@@ -91,15 +91,15 @@ app.get("/articles/search_1", getArticlesByAuthor);
 const getAnArticleById = async (req, res) => {
   const id = req.body.id;
   await articles
-    .find({ author: id })
-    .populate("author", "firstName lastName age country")
+    .find({ _id: id })
+    .populate("author", "firstName")
     .exec()
     .then((rsl) => {
       res.status(200);
       res.json(rsl);
     })
     .catch((err) => {
-      es.status(404);
+      res.status(404);
       res.json(err);
     });
 };
@@ -189,8 +189,11 @@ const createNewComment = (req, res) => {
     res.json(rsl);
     ID = rsl._id;
   });
-  articles.findOneAndUpdate({ _id: idFoArticle }, { $push: { comments: ID } });
+  articles
+    .findOneAndUpdate({ _id: idFoArticle }, { $push: { comments: ID } })
+    .exec();
 };
+
 app.post("/articles/:id/comments", createNewComment);
 
 app.listen(PORT, () => {
