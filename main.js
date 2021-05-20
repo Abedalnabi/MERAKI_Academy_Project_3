@@ -221,10 +221,11 @@ app.post("/roles", async (req, res) => {
 // createNewComment
 
 const authentication = (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
+  let token = req.headers.authorization.split(" ")[1];
   const secret = process.env.SECRET;
   jwt.verify(token, secret, (err, rsl) => {
     if (rsl) {
+      token = rsl;
       next();
     }
     if (err) {
