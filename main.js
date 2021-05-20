@@ -203,7 +203,7 @@ app.post("/login", login);
 
 // roles
 
-const rolesFun = (req, res) => {
+const rolesFun = async (req, res) => {
   const { role, permissions } = req.body;
   const roles = await new Roles({ role, permissions });
   roles
