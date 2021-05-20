@@ -203,7 +203,7 @@ app.post("/login", login);
 
 // roles
 
-app.post("/roles", async (req, res) => {
+const rolesFun = (req, res) => {
   const { role, permissions } = req.body;
   const roles = await new Roles({ role, permissions });
   roles
@@ -216,9 +216,11 @@ app.post("/roles", async (req, res) => {
       res.status(404);
       res.send(err);
     });
-});
+};
 
-// createNewComment
+app.post("/roles", rolesFun);
+
+// createNewComment && authentication
 
 const authentication = (req, res, next) => {
   let token = req.headers.authorization.split(" ")[1];
