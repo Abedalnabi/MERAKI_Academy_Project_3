@@ -4,6 +4,7 @@ const { uuid } = require("uuidv4");
 const { Users, articles, Comments } = require("./schema");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // const a = require("./schema");
 // const b = require("./schema");
@@ -113,10 +114,7 @@ app.get("/articles/search_2", getAnArticleById);
 // updateAnArticleById
 
 const updateAnArticleById = async (req, res) => {
-  if (
-    req.body.hasOwnProperty("title") &&
-    req.body.hasOwnProperty("description")
-  ) {
+  if (req.body.hasOwnProperty("title") && req.body.hasOwnProperty("description")) {
     const id = req.params.id;
     update = req.body;
     await articles.findOneAndUpdate({ _id: id }, { updated });
@@ -164,16 +162,43 @@ app.delete("/articles", deleteArticlesByAuthor);
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  await Users.findOne({ email: email, password: password }).then((rsl) => {
-    console.log(rsl);
-    if (rsl) {
-      res.status(200);
-      res.json("Valid login credentials");
-    } else {
-      res.status(401);
-      res.json("Invalid login credentials");
-    }
-  });
+
+  informationForUser = await Users.findOne({ email: email }, "password country");
+  if (informationForUser) {
+    bcrypt.compare(password, informationForUser.password, (err, rsl) => {
+      if (rsl) {
+        const payload = {
+          userId: informationForUser._id,
+          country: informationForUser.country,
+        };
+        const options = { expiresIn: "60m" };
+        secret = process.env.SECRET;
+        res.status(200);
+        res.json(jwt.sign(payload, secret, options));
+      } else {
+        res.status(403);
+        res.json({
+          massage: "the password you,ve entered is incorrect",
+          status: 403,
+        });
+      }
+    });
+  } else {
+    res.status(404);
+    res.json({
+      massage: "the email doesn,t exist",
+      status: 404,
+    });
+  }
+  // await Users.findOne({ email: email, password: password }).then((rsl) => {
+  //   if (rsl) {
+  //     res.status(200);
+  //     res.json("Valid login credentials");
+  //   } else {
+  //     res.status(401);
+  //     res.json("Invalid login credentials");
+  //   }
+  // });
 };
 
 app.post("/login", login);
@@ -194,9 +219,7 @@ const createNewComment = (req, res) => {
       res.status(201);
       res.json(rsl);
       ID = rsl._id;
-      articles
-        .findOneAndUpdate({ _id: idFoArticle }, { $push: { comments: ID } })
-        .exec();
+      articles.findOneAndUpdate({ _id: idFoArticle }, { $push: { comments: ID } }).exec();
     })
     .catch((err) => {
       res.status(404);
