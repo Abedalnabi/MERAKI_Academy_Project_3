@@ -311,7 +311,7 @@ const createNewComment = (req, res) => {
     });
 };
 
-app.post("/articles/:id/comments", authentication, authorization, createNewComment);
+app.post("/articles/:id/comments", authorization, createNewComment);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
