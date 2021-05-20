@@ -194,21 +194,29 @@ const login = async (req, res) => {
       status: err.status,
     });
   }
-  // await Users.findOne({ email: email, password: password }).then((rsl) => {
-  //   if (rsl) {
-  //     res.status(200);
-  //     res.json("Valid login credentials");
-  //   } else {
-  //     res.status(401);
-  //     res.json("Invalid login credentials");
-  //   }
-  // });
 };
 
 app.post("/login", login);
 
 // createNewComment
-
+const authentication = (req, res, next) => {
+  const token = req.headers.authorization.split(" ")[1];
+  const secret = process.env.SECRET;
+  jwt.verify(token, secret, (err, rsl) => {
+    if (rsl) {
+      next();
+    }
+    if (err) {
+      const err = new Error("the token is invalid or expired");
+      err.status = 403;
+      res.status(403);
+      res.json({
+        massage: err.message,
+        status: err.status,
+      });
+    }
+  });
+};
 const createNewComment = (req, res) => {
   const idFoArticle = req.params;
   const { comment, commenter } = req.body;
@@ -231,7 +239,7 @@ const createNewComment = (req, res) => {
     });
 };
 
-app.post("/articles/:id/comments", createNewComment);
+app.post("/articles/:id/comments", authentication, createNewComment);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
