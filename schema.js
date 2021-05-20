@@ -1,7 +1,5 @@
-console.log("*-----------Project 3 *-----------");
-
 const mongoose = require("mongoose");
-
+const bcrypt = require("bcrypt");
 const usersSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -21,6 +19,12 @@ const articlesSchema = new mongoose.Schema({
 const commentsSchema = new mongoose.Schema({
   comment: { type: String },
   commenter: { type: mongoose.Schema.ObjectId, ref: "Users" },
+});
+
+usersSchema.pre("save", async function () {
+  const hashedPassword = await bcrypt.hash(this.password, 10);
+  this.email = this.email.toLowerCase();
+  this.password = hashedPassword;
 });
 
 const Users = mongoose.model("Users", usersSchema);

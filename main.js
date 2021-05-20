@@ -1,9 +1,10 @@
-console.log("*-----------Project 3 *-----------");
-
 const { json } = require("express");
 const express = require("express");
 const { uuid } = require("uuidv4");
 const { Users, articles, Comments } = require("./schema");
+require("dotenv").config();
+const bcrypt = require("bcrypt");
+
 // const a = require("./schema");
 // const b = require("./schema");
 //this is same above User2 a.User2
@@ -13,7 +14,8 @@ const { Users, articles, Comments } = require("./schema");
 const db = require("./db");
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.DB_URI;
+
 app.use(express.json());
 
 //createNewAuthor
@@ -163,6 +165,7 @@ app.delete("/articles", deleteArticlesByAuthor);
 const login = async (req, res) => {
   const { email, password } = req.body;
   await Users.findOne({ email: email, password: password }).then((rsl) => {
+    console.log(rsl);
     if (rsl) {
       res.status(200);
       res.json("Valid login credentials");
