@@ -228,6 +228,7 @@ const authentication = (req, res, next) => {
   jwt.verify(token, secret, (err, rsl) => {
     if (rsl) {
       token = rsl;
+      console.log(token);
       next();
     }
     if (err) {
@@ -240,6 +241,21 @@ const authentication = (req, res, next) => {
       });
     }
   });
+};
+
+//authorization
+
+const authorization = async function () {
+  let permissions = token.permissions;
+
+  return function (req, res, next) {
+    if (permissions === string) {
+      next();
+    } else {
+      res.status(403);
+      res.json({ massage: "Not macthes" });
+    }
+  };
 };
 const createNewComment = (req, res) => {
   const idFoArticle = req.params;
@@ -263,7 +279,7 @@ const createNewComment = (req, res) => {
     });
 };
 
-app.post("/articles/:id/comments", authentication, createNewComment);
+app.post("/articles/:id/comments", authentication, authorization, createNewComment);
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
