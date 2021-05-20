@@ -22,7 +22,7 @@ app.use(express.json());
 //createNewAuthor
 
 const createNewAuthor = (req, res) => {
-  const { firstName, lastName, age, country, email, password } = req.body;
+  const { firstName, lastName, age, country, email, password, role } = req.body;
   const newUser = new Users({
     firstName,
     lastName,
@@ -30,6 +30,7 @@ const createNewAuthor = (req, res) => {
     country,
     email,
     password,
+    role,
   });
   newUser
     .save()
@@ -163,13 +164,15 @@ app.delete("/articles", deleteArticlesByAuthor);
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  informationForUser = await Users.findOne({ email: email }, "password country");
+  informationForUser = await Users.findOne({ email: email }, "password country role");
+  const role = await Roles.findOne({ _id: informationForUser.role });
   if (informationForUser) {
     bcrypt.compare(password, informationForUser.password, (err, rsl) => {
       if (rsl) {
         const payload = {
           userId: informationForUser._id,
           country: informationForUser.country,
+          role: role,
         };
         const options = { expiresIn: "60m" };
         secret = process.env.SECRET;
@@ -198,7 +201,25 @@ const login = async (req, res) => {
 
 app.post("/login", login);
 
+// roles
+
+app.post("/roles", async (req, res) => {
+  const { role, permissions } = req.body;
+  const roles = await new Roles({ role, permissions });
+  roles
+    .save()
+    .then((rsl) => {
+      res.status(201);
+      res.json(rsl);
+    })
+    .catch((err) => {
+      res.status(404);
+      res.send(err);
+    });
+});
+
 // createNewComment
+
 const authentication = (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   const secret = process.env.SECRET;
