@@ -176,18 +176,22 @@ const login = async (req, res) => {
         res.status(200);
         res.json(jwt.sign(payload, secret, options));
       } else {
+        const err = new Error("the password you,ve entered is incorrect");
+        err.status = 403;
         res.status(403);
         res.json({
-          massage: "the password you,ve entered is incorrect",
-          status: 403,
+          massage: err.massage,
+          status: err.status,
         });
       }
     });
   } else {
+    const err = new Error("the email doesn't exist");
+    err.status = 404;
     res.status(404);
     res.json({
-      massage: "the email doesn,t exist",
-      status: 404,
+      massage: err.message,
+      status: err.status,
     });
   }
   // await Users.findOne({ email: email, password: password }).then((rsl) => {
