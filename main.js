@@ -66,7 +66,7 @@ app.post("/articles", createNewArticle);
 
 const getAllArticles = async (req, res) => {
   res.status(200);
-  res.json(await articles.find()).exec();
+  res.json(await articles.find());
 };
 app.get("/articles", getAllArticles);
 
@@ -222,6 +222,37 @@ app.post("/roles", rolesFun);
 
 // createNewComment && authentication &&authorization
 
+const authorization = function (string) {
+  let token = req.headers.authorization.split(" ")[1];
+  const secret = process.env.SECRET;
+  let permissions = token.permissions;
+
+  if (permissions === string) {
+    // authentication function
+    return function (req, res, next) {
+      jwt.verify(token, secret, (err, rsl) => {
+        if (rsl) {
+          req.token = rsl;
+          next();
+        }
+        if (err) {
+          const err = new Error("the token is invalid or expired");
+          err.status = 403;
+          res.status(403);
+          res.json({
+            massage: err.message,
+            status: err.status,
+          });
+        }
+      });
+    };
+  } else {
+    res.status(403);
+    res.json({ massage: "Not matches" });
+  }
+};
+
+/*
 const authentication = (req, res, next) => {
   // let token = req.headers.authorization.split(" ")[1];
   // const secret = process.env.SECRET;
@@ -242,7 +273,8 @@ const authentication = (req, res, next) => {
   });
 };
 
-/*/////////////////////////////////////////////////////////////
+/////
+/*
 const authorization = async function (string) {
   let permissions = token.permissions;
 
@@ -255,22 +287,7 @@ const authorization = async function (string) {
     }
   };
 };
-*/ ///////////////////////////////////////////////////////
-
-const authorization = async function (string) {
-  let token = req.headers.authorization.split(" ")[1];
-  const secret = process.env.SECRET;
-  let permissions = token.permissions;
-  if (permissions === string) {
-    return function () {
-      authentication();
-    };
-  } else {
-    res.status(403);
-    res.json({ massage: "Not macthes" });
-  }
-};
-
+*/
 const createNewComment = (req, res) => {
   const idFoArticle = req.params;
   const { comment, commenter } = req.body;
