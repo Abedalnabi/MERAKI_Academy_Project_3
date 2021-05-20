@@ -21,6 +21,10 @@ const commentsSchema = new mongoose.Schema({
   commenter: { type: mongoose.Schema.ObjectId, ref: "Users" },
 });
 
+const rolesSchema = new mongoose.Schema({
+  role: { type: String },
+  permissions: [{ type: String }],
+});
 usersSchema.pre("save", async function () {
   const hashedPassword = await bcrypt.hash(this.password, 10);
   this.email = this.email.toLowerCase();
@@ -30,6 +34,7 @@ usersSchema.pre("save", async function () {
 const Users = mongoose.model("Users", usersSchema);
 const articles = mongoose.model("articles", articlesSchema);
 const Comments = mongoose.model("Comments", commentsSchema);
+const R = mongoose.model("Comments", commentsSchema);
 
 module.exports.Users = Users;
 module.exports.articles = articles;
