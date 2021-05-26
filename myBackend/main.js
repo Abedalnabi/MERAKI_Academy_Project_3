@@ -201,7 +201,7 @@ const login = async (req, res) => {
 
 app.post("/login", login);
 
-// roles
+/// roles
 
 const rolesFun = async (req, res) => {
   const { role, permissions } = req.body;
