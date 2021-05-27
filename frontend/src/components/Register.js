@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, Route, useHistory } from "react-router-dom";
+import Navigation from "./Navigation";
 
 export default function Register() {
   const history = useHistory();
@@ -36,6 +37,7 @@ export default function Register() {
   };
   return (
     <div>
+      <Navigation />
       <p>Register</p>
       <input
         type="text"

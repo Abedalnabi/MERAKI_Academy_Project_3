@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, Route, useHistory } from "react-router-dom";
 import { BrowserRouter as Router } from "react-router-dom";
+import Dashboard from "./Dashboard";
+import Navigation from "./Navigation";
 
 export default function Login() {
+  const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState();
 
@@ -28,6 +31,7 @@ export default function Login() {
   };
   return (
     <div>
+      <Navigation />
       <input
         type="text"
         placeholder="Email here"
@@ -45,7 +49,7 @@ export default function Login() {
       ></input>
       <br></br>
       <button onClick={checkEmailAndPassword}>Login</button>
-      {state ? <p></p> : <p>login successfully</p>}
+      {state ? <p></p> : history.push("/Dashboard")}
       {state1 ? <p></p> : <p>password Or email uncorrect</p>}
     </div>
   );
