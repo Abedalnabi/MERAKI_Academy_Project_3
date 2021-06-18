@@ -1,21 +1,41 @@
-const usersModel = require('./../../db/models/users');
+const usersModel = require("../../db/models/users");
+const connection = require("./../../db/db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-const login = (req, res) => {
-	const { email, password } = req.body;
+const login = async (req, res) => {
+  const { email, password } = req.body;
 
-	usersModel
-		.authenticateBasic(email, password)
-		.then((result) => {
-			if (result[1] === 200)
-				return res.status(result[1]).json({ token: result[0] });
+  const query = `select * from users where email= ? `;
+  const query2 = `select * from users where password= ? `;
 
-			res.status(result[1]).json(result[0]);
-		})
-		.catch((err) => {
-			res.send(err);
-		});
+  const data1 = [email];
+  const data2 = [password];
+
+  const emailcheck = await connection.promise().query(query, data1);
+  if (!emailcheck[0][0]) return res.json("this email doesnt existe");
+
+  console.log("emailcheck", emailcheck[0][0]);
+  const valid = await bcrypt.compare(password, emailcheck[0][0].password);
+  if (valid) {
+    const payload = {
+      userId: "user._id,",
+      country: "user.country,",
+      role: "user.role,",
+    };
+
+    const options = {
+      expiresIn: "60m",
+    };
+
+    res.json(jwt.sign(payload, process.env.SECRET, options));
+  }
+  const passCheck = await connection.promise().query(query2, data2);
+  if (!passCheck[0][0]) return res.json("this password incorrect");
+
+  res.json(emailcheck[0]);
 };
 
 module.exports = {
-	login,
+  login,
 };
